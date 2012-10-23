@@ -1,0 +1,4 @@
+.lein*
+pom.xml
+target
+logs
