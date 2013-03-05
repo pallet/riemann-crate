@@ -2,3 +2,6 @@
 pom.xml
 target
 logs
+doc
+doc-src/INTRO.md
+doc-src/VERSIONS.md

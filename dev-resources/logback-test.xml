@@ -10,7 +10,7 @@
     </encoder>
   </appender>
 
-  <appender name="COMPUTFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+  <appender name="COMPUTEFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>logs/jclouds-compute.log</file>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
       <fileNamePattern>logs/old/jclouds-compute.%d{yyyy-MM-dd}.log</fileNamePattern>
@@ -70,7 +70,7 @@
     <appender-ref ref="COMPUTEFILE" />
   </logger>
 
-  <logger name="pallet" level="DEBUG">
+  <logger name="pallet" level="TRACE">
     <appender-ref ref="PALLETFILE" />
   </logger>
 
@@ -78,7 +78,7 @@
     <appender-ref ref="PALLETFILE" />
   </logger>
 
-  <logger name="vmfest" level="DEBUG">
+  <logger name="vmfest" level="TRACE">
     <appender-ref ref="VMFESTFILE" />
   </logger>
 
@@ -88,7 +88,7 @@
   <logger name="pallet.core.primitives" level="DEBUG"/>
   <!-- <logger name="pallet.execute.default-executor" level="TRACE"/> -->
 
-  <root level="DEBUG">
+  <root level="TRACE">
     <appender-ref ref="CONSOLE" />
   </root>
 
