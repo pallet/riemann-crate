@@ -1,6 +1,5 @@
 {:dev
- {:dependencies [[com.palletops/pallet "0.8.0-SNAPSHOT" :classifier "tests"]
-                 [org.cloudhoist/ssh-transport "0.3.3-SNAPSHOT"]
+ {:dependencies [[com.palletops/pallet "0.8.0-beta.1" :classifier "tests"]
                  [com.palletops/java-crate "0.8.0-beta.1"]
                  [com.palletops/crates "0.8.0-SNAPSHOT"]
                  [riemann-clojure-client "0.0.3"]
