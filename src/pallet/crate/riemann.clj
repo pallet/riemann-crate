@@ -5,9 +5,9 @@
    [pallet.action :refer [with-action-options]]
    [pallet.actions :refer [directory exec-checked-script remote-directory
                            remote-file]]
-   [pallet.api :refer [plan-fn server-spec]]
+   [pallet.api :refer [plan-fn] :as api]
    [pallet.crate :refer [assoc-settings defmethod-plan defplan get-settings]]
-   [pallet.crate-install :refer [install]]
+   [pallet.crate-install :as crate-install]
    [pallet.utils :refer [apply-map]]
    [pallet.version-dispatch :refer [defmethod-version-plan
                                     defmulti-version-plan]]))
@@ -70,38 +70,38 @@
                           :md5-url (str (url settings) ".md5")
                           :tar-options "xj"})))
 
-(defplan riemann-settings
+(defplan settings
   "Settings for riemann"
   [{:keys [user owner group dist dist-urls version instance-id]
     :as settings}]
   (let [settings (merge (default-settings) settings)
         settings (settings-map (:version settings) settings)]
-    (assoc-settings :riemann settings {:instance-id instance-id}))
+    (assoc-settings :riemann settings {:instance-id instance-id})))
 
 ;;; # User
-  (defplan riemann-user
-    "Create the riemann user"
-    [{:keys [instance-id] :as options}]
-    (let [{:keys [user owner group home]} (get-settings :riemann options)]
-      (actions/group group :system true)
-      (when (not= owner user)
-        (actions/user owner :group group :system true))
-      (actions/user
-       user :group group :system true :create-home true :shell :bash))))
+(defplan riemann-user
+  "Create the riemann user"
+  [{:keys [instance-id] :as options}]
+  (let [{:keys [user owner group home]} (get-settings :riemann options)]
+    (actions/group group :system true)
+    (when (not= owner user)
+      (actions/user owner :group group :system true))
+    (actions/user
+     user :group group :system true :create-home true :shell :bash)))
 
 ;;; # Install
-(defmethod-plan install ::download
+(defmethod-plan crate-install/install ::download
   [facility instance-id]
   (let [{:keys [user owner group home remote-file] :as settings}
         (get-settings facility {:instance-id instance-id})]
     (directory home :owner owner :group group)
     (apply-map remote-directory home :owner owner :group group remote-file)))
 
-(defplan install-riemann
+(defplan install
   "Install riemann."
   [& {:keys [instance-id]}]
   (let [settings (get-settings :riemann {:instance-id instance-id})]
-    (install :riemann instance-id)))
+    (crate-install/install :riemann instance-id)))
 
 ;;; # Configuration
 (defplan config-file
@@ -114,14 +114,14 @@
    :owner owner :group group
    (apply concat file-source)))
 
-(defplan riemann-conf
+(defplan config
   "Write all config files"
   [{:keys [instance-id] :as options}]
   (let [{:keys [config home user owner group] :as settings}
         (get-settings :riemann options)]
     (config-file settings "riemann.conf" {:content (str config)})))
 
-(defplan riemann-run
+(defplan run
   "Run riemann."
   [{:keys [instance-id] :as options}]
   (let [{:keys [home user config-dir]}
@@ -134,14 +134,14 @@
         "& )")
        ("sleep" 5)))))
 
-(defn riemann
-  "Returns a server-spec that installs and configures riemann"
+(defn server-spec
+  "Returns a server-spec that installs and configures riemann."
   [settings & {:keys [instance-id] :as options}]
-  (server-spec
+  (api/server-spec
    :phases
-   {:settings (plan-fn (riemann-settings (merge settings options)))
+   {:settings (plan-fn (pallet.crate.riemann/settings (merge settings options)))
     :install (plan-fn
               (riemann-user options)
-              (install-riemann :instance-id instance-id))
-    :configure (plan-fn (riemann-conf options)
-                        (riemann-run options))}))
+              (install :instance-id instance-id))
+    :configure (plan-fn (config options)
+                        (run options))}))
