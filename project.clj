@@ -1,4 +1,4 @@
-(defproject com.palletops/riemann-crate "0.8.0-alpha.1"
+(defproject com.palletops/riemann-crate "0.8.0-SNAPSHOT"
   :description "Crate for riemann installation"
   :url "http://github.com/pallet/riemann-crate"
   :license {:name "Eclipse Public License"
