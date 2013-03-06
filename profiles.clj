@@ -24,4 +24,7 @@
                  "codox" ["doc"]
                  "doc" ["do" "codox," "marg"]}
        }
- :pallet {:jvm-opts ["-Djna.nosys=true"]}}
+ :pallet {:jvm-opts ["-Djna.nosys=true"]}
+ :release
+ {:set-version
+  {:updates [{:path "README.md" :no-snapshot true}]}}}
