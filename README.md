@@ -1,7 +1,8 @@
-[Repository](https://github.com/pallet/riemann-crate) &#xb7; [Issues](https://github.com/pallet/riemann-crate/issues)
+[Repository](https://github.com/pallet/riemann-crate) &#xb7; [Issues](https://github.com/pallet/riemann-crate/issues) &#xb7; [API docs](http://palletops.com/riemann-crate/0.8/api) &#xb7; [Annotated source](http://palletops.com/riemann-crate/0.8/annotated/uberdoc.html)
 
 A [pallet](http://palletops.com/) crate to install and configure
  [riemann](http://riemann.io).
+
 ### Dependency Information
 
 ```clj
@@ -25,6 +26,7 @@ A [pallet](http://palletops.com/) crate to install and configure
   </tr>
 </tbody>
 </table>
+
 ## Usage
 
 The riemann crate provides a `server-spec` function that returns a
@@ -50,6 +52,7 @@ The `config` function writes the riemann configuration file, using the form
 passed to the :config key in the `settings` function.
 
 The `run` function starts the riemann server.
+
 ## License
 
 Copyright (C) 2012, 2013 Hugo Duncan
