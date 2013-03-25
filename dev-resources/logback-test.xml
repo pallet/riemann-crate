@@ -70,7 +70,7 @@
     <appender-ref ref="COMPUTEFILE" />
   </logger>
 
-  <logger name="pallet" level="TRACE">
+  <logger name="pallet" level="DEBUG">
     <appender-ref ref="PALLETFILE" />
   </logger>
 
@@ -86,9 +86,10 @@
   <logger name="pallet.algo.fsm" level="WARN"/>
   <logger name="pallet.algo.fsmop" level="WARN"/>
   <logger name="pallet.core.primitives" level="DEBUG"/>
+  <logger name="pallet.stevedore" level="INFO"/>
   <!-- <logger name="pallet.execute.default-executor" level="TRACE"/> -->
 
-  <root level="TRACE">
+  <root level="DEBUG">
     <appender-ref ref="CONSOLE" />
   </root>
 
