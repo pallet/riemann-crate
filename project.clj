@@ -4,7 +4,4 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.4.0"]
-                 [com.palletops/pallet "0.8.0-SNAPSHOT"]]
-  :repositories
-  {"sonatype-snapshots" "https://oss.sonatype.org/content/repositories/snapshots"
-   "sonatype" "https://oss.sonatype.org/content/repositories/releases/"})
+                 [com.palletops/pallet "0.8.0-beta.6"]])

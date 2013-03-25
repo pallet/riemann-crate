@@ -1,6 +1,7 @@
 (ns pallet.crate.riemann
   "A pallet crate to install and configure riemann"
   (:require
+   [clojure.tools.logging :refer [debugf]]
    [pallet.actions :as actions]
    [pallet.action :refer [with-action-options]]
    [pallet.actions :refer [directory exec-checked-script remote-directory
@@ -8,7 +9,12 @@
    [pallet.api :refer [plan-fn] :as api]
    [pallet.crate :refer [assoc-settings defmethod-plan defplan get-settings]]
    [pallet.crate-install :as crate-install]
+   [pallet.crate.nohup]
+   [pallet.crate.service
+    :refer [supervisor-config supervisor-config-map] :as service]
    [pallet.utils :refer [apply-map]]
+   [pallet.script.lib :refer [config-root file log-root]]
+   [pallet.stevedore :refer [fragment]]
    [pallet.version-dispatch :refer [defmethod-version-plan
                                     defmulti-version-plan]]))
 
@@ -17,16 +23,26 @@
   riemann-config-changed-flag "riemann-config")
 
 ;;; # Settings
-(defn default-settings []
+(defn service-name
+  "Return a service name for riemann."
+  [{:keys [instance-id] :as options}]
+  (str "riemann" (when instance-id (str "-" instance-id))))
+
+(defn default-settings [options]
   {:version "0.1.5"
    :user "riemann"
    :owner "riemann"
    :group "riemann"
    :home "/opt/riemann"
-   :config-dir "/etc/riemann/"
+   :config-dir (fragment (file (config-root) "riemann"))
+   :log-dir (fragment (file (log-root) "riemann"))
+   :supervisor :nohup
+   :nohup {:process-name "java"}
+   :service-name (service-name options)
    :dist-url "http://aphyr.com/riemann/riemann-%s.tar.bz2"
+   :deb-url "http://aphyr.com/riemann/riemann_%s_all.deb"
    :config '(do
-              (logging/init :file "riemann.log")
+              (logging/init :file "/var/log/riemann/riemann.log")
               (tcp-server :host "0.0.0.0")
               (udp-server :host "0.0.0.0")
 
@@ -55,6 +71,11 @@
   {:pre [dist-url version]}
   (format dist-url version))
 
+(defn run-command
+  "Return a script command to run riemann."
+  [{:keys [home user config-dir] :as settings}]
+  (fragment ((file ~home "bin" "riemann") (file ~config-dir "riemann.conf"))))
+
 ;;; At the moment we just have a single implementation of settings,
 ;;; but this is open-coded.
 (defmulti-version-plan settings-map [version settings])
@@ -70,16 +91,32 @@
                           :md5-url (str (url settings) ".md5")
                           :tar-options "xj"})))
 
+
+(defmethod supervisor-config-map [:riemann :runit]
+  [_ {:keys [run-command service-name user] :as settings} options]
+  {:service-name service-name
+   :run-file {:content (str "#!/bin/sh\nexec chpst -u " user " " run-command)}})
+
+(defmethod supervisor-config-map [:riemann :nohup]
+  [_ {:keys [run-command service-name user] :as settings} options]
+  {:service-name service-name
+   :run-file {:content run-command}
+   :user user})
+
 (defplan settings
   "Settings for riemann"
   [{:keys [user owner group dist dist-urls version instance-id]
-    :as settings}]
-  (let [settings (merge (default-settings) settings)
-        settings (settings-map (:version settings) settings)]
-    (assoc-settings :riemann settings {:instance-id instance-id})))
+    :as settings}
+   & {:keys [instance-id] :as options}]
+  (let [settings (merge (default-settings options) settings)
+        settings (settings-map (:version settings) settings)
+        settings (update-in settings [:run-command]
+                            #(or % (run-command settings)))]
+    (assoc-settings :riemann settings {:instance-id instance-id})
+    (supervisor-config :riemann settings (or options {}))))
 
 ;;; # User
-(defplan riemann-user
+(defplan user
   "Create the riemann user"
   [{:keys [instance-id] :as options}]
   (let [{:keys [user owner group home]} (get-settings :riemann options)]
@@ -99,40 +136,41 @@
 
 (defplan install
   "Install riemann."
-  [& {:keys [instance-id]}]
-  (let [settings (get-settings :riemann {:instance-id instance-id})]
-    (crate-install/install :riemann instance-id)))
+  [{:keys [instance-id]}]
+  (let [{:keys [owner group log-dir] :as settings}
+        (get-settings :riemann {:instance-id instance-id})]
+    (crate-install/install :riemann instance-id)
+    (when log-dir
+      (directory log-dir :owner owner :group group :mode "0755"))))
 
 ;;; # Configuration
 (defplan config-file
   "Helper to write config files"
   [{:keys [owner group config-dir] :as settings} filename file-source]
   (directory config-dir :owner owner :group group)
-  (apply
-   remote-file (str config-dir "/" filename)
+  (apply-map
+   remote-file (fragment (file ~config-dir ~filename))
    :flag-on-changed riemann-config-changed-flag
    :owner owner :group group
-   (apply concat file-source)))
+   file-source))
 
-(defplan config
+(defplan configure
   "Write all config files"
   [{:keys [instance-id] :as options}]
-  (let [{:keys [config home user owner group] :as settings}
-        (get-settings :riemann options)]
+  (let [{:keys [config] :as settings} (get-settings :riemann options)]
+    (debugf "configure %s %s" settings options)
     (config-file settings "riemann.conf" {:content (str config)})))
 
-(defplan run
-  "Run riemann."
-  [{:keys [instance-id] :as options}]
-  (let [{:keys [home user config-dir]}
+;;; # Run
+(defplan service
+  "Run the riemann service."
+  [& {:keys [action if-flag if-stopped instance-id]
+      :or {action :manage}
+      :as options}]
+  (let [{:keys [supervision-options] :as settings}
         (get-settings :riemann {:instance-id instance-id})]
-    (with-action-options {:script-dir home :sudo-user user}
-      (exec-checked-script
-       (str "Riemann run")
-       ("("
-        ("nohup" (str ~home "/bin/riemann") (str ~config-dir "/riemann.conf"))
-        "& )")
-       ("sleep" 5)))))
+    (service/service settings (merge supervision-options
+                                     (dissoc options :instance-id)))))
 
 (defn server-spec
   "Returns a server-spec that installs and configures riemann."
@@ -141,7 +179,12 @@
    :phases
    {:settings (plan-fn (pallet.crate.riemann/settings (merge settings options)))
     :install (plan-fn
-              (riemann-user options)
-              (install :instance-id instance-id))
-    :configure (plan-fn (config options)
-                        (run options))}))
+               (user options)
+               (install options))
+    :configure (plan-fn
+                 (configure options)
+                 (apply-map service :action :enable options))
+    :run (plan-fn
+           (apply-map service :action :start options))
+    :stop (plan-fn
+            (apply-map service :action :stop options))}))

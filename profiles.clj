@@ -1,10 +1,10 @@
 {:dev
- {:dependencies [[com.palletops/pallet "0.8.0-SNAPSHOT" :classifier "tests"]
-                 [com.palletops/java-crate "0.8.0-beta.1"]
-                 [com.palletops/runit-crate "0.8.0-SNAPSHOT"]
-                 [com.palletops/crates "0.8.0-SNAPSHOT"]
+ {:dependencies [[com.palletops/pallet "0.8.0-beta.6" :classifier "tests"]
+                 [com.palletops/java-crate "0.8.0-beta.2"]
+                 [com.palletops/crates "0.1.0"]
                  [riemann-clojure-client "0.0.3"]
                  [ch.qos.logback/logback-classic "1.0.9"]]
+  :plugins [[com.palletops/pallet-lein "0.6.0-beta.8"]]
   :aliases {"live-test-up"
             ["pallet" "up"
              "--phases" "install,configure,test"
@@ -15,7 +15,7 @@
                    :live-test :live-test
                    :all (constantly true)}
   :repositories {"boundary-site" "http://maven.boundary.com/artifactory/repo"}}
- :doc {:dependencies [[com.palletops/pallet-codox "0.1.0-SNAPSHOT"]]
+ :doc {:dependencies [[com.palletops/pallet-codox "0.1.0"]]
        :plugins [[codox/codox.leiningen "0.6.4"]
                  [lein-marginalia "0.7.1"]]
        :codox {:writer codox-md.writer/write-docs
