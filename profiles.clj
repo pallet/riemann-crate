@@ -1,12 +1,15 @@
 {:dev
- {:dependencies [[com.palletops/pallet "0.8.0-beta.1" :classifier "tests"]
+ {:dependencies [[com.palletops/pallet "0.8.0-SNAPSHOT" :classifier "tests"]
                  [com.palletops/java-crate "0.8.0-beta.1"]
+                 [com.palletops/runit-crate "0.8.0-SNAPSHOT"]
                  [com.palletops/crates "0.8.0-SNAPSHOT"]
                  [riemann-clojure-client "0.0.3"]
                  [ch.qos.logback/logback-classic "1.0.9"]]
   :aliases {"live-test-up"
-            ["pallet" "up" "--phases" "install,configure,test"]
-            "live-test-down" ["pallet" "down"]
+            ["pallet" "up"
+             "--phases" "install,configure,test"
+             "--selector" "live-test"]
+            "live-test-down" ["pallet" "down" "--selector" "live-test"]
             "live-test" ["do" "live-test-up," "live-test-down"]}
   :test-selectors {:default (complement :live-test)
                    :live-test :live-test
