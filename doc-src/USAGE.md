@@ -19,7 +19,7 @@ present installation from tarball url is the only supported method.
 Installation from deb or rpm url would be nice to add, as these are now
 available from the riemann site.
 
-The `config` function writes the riemann configuration file, using the form
+The `configure` function writes the riemann configuration file, using the form
 passed to the :config key in the `settings` function.
 
 The `run` function starts the riemann server.

@@ -1,4 +1,8 @@
-[Repository](https://github.com/pallet/riemann-crate) &#xb7; [Issues](https://github.com/pallet/riemann-crate/issues) &#xb7; [API docs](http://palletops.com/riemann-crate/0.8/api) &#xb7; [Annotated source](http://palletops.com/riemann-crate/0.8/annotated/uberdoc.html)
+[Repository](https://github.com/pallet/riemann-crate) &#xb7;
+[Issues](https://github.com/pallet/riemann-crate/issues) &#xb7;
+[API docs](http://palletops.com/riemann-crate/0.8/api) &#xb7;
+[Annotated source](http://palletops.com/riemann-crate/0.8/annotated/uberdoc.html) &#xb7;
+[Release Notes](https://github.com/pallet/riemann-crate/blob/develop/ReleaseNotes.md)
 
 A [pallet](http://palletops.com/) crate to install and configure
  [riemann](http://riemann.io).
@@ -6,7 +10,7 @@ A [pallet](http://palletops.com/) crate to install and configure
 ### Dependency Information
 
 ```clj
-:dependencies [[com.palletops/riemann-crate "0.8.0-alpha.1"]]
+:dependencies [[com.palletops/riemann-crate "0.8.0-alpha.2"]]
 ```
 
 ### Releases
@@ -16,6 +20,14 @@ A [pallet](http://palletops.com/) crate to install and configure
   <tr><th>Pallet</th><th>Crate Version</th><th>Repo</th><th>GroupId</th></tr>
 </thead>
 <tbody>
+  <tr>
+    <th>0.8.0-beta.6</th>
+    <td>0.8.0-alpha.2</td>
+    <td>clojars</td>
+    <td>com.palletops</td>
+    <td><a href='https://github.com/pallet/riemann-crate/blob/0.8.0-alpha.2/ReleaseNotes.md'>Release Notes</a></td>
+    <td><a href='https://github.com/pallet/riemann-crate/blob/0.8.0-alpha.2/'>Source</a></td>
+  </tr>
   <tr>
     <th>0.8.0-beta.1</th>
     <td>0.8.0-alpha.1</td>
@@ -48,7 +60,7 @@ present installation from tarball url is the only supported method.
 Installation from deb or rpm url would be nice to add, as these are now
 available from the riemann site.
 
-The `config` function writes the riemann configuration file, using the form
+The `configure` function writes the riemann configuration file, using the form
 passed to the :config key in the `settings` function.
 
 The `run` function starts the riemann server.
