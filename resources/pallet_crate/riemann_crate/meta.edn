@@ -3,7 +3,10 @@
  "A [pallet](http://palletops.com/) crate to install and configure
  [riemann](http://riemann.io)."
  :git-repo "https://github.com/pallet/riemann-crate"
+ :api-docs "http://palletops.com/riemann-crate/0.8/api"
+ :annotated-docs "http://palletops.com/riemann-crate/0.8/annotated/uberdoc.html"
  :tag-prefix ""
  :artifact-id "riemann-crate"
  :source-path "src/pallet/crate/riemann.clj"
- :versions [{:pallet "0.8.0-beta.1" :version "0.8.0-alpha.1"}]}
+ :versions [{:pallet "0.8.0-beta.6" :version "0.8.0-alpha.2"}
+            {:pallet "0.8.0-beta.1" :version "0.8.0-alpha.1"}]}

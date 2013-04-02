@@ -28,16 +28,23 @@ echo "Changes since $previous_version"
 git --no-pager log --pretty=changelog $previous_version..
 echo ""
 echo ""
+
+$EDITOR resources/pallet_crate/riemann_crate/meta.edn
+$EDITOR doc-src/USAGE.md
+git add resources/pallet_crate/riemann_crate/meta.edn doc-src/USAGE.md doc-src/FOOTER.md \
+&& git commit -m "Updated metadata for $version" \
+&& lein crate-doc \
+|| exit 1
+
 echo "Now edit project.clj, ReleaseNotes and README"
 
 $EDITOR project.clj
 $EDITOR ReleaseNotes.md
 $EDITOR README.md
-$EDITOR resources/pallet/riemann_crate/meta.edn
 
 echo -n "commiting project.clj, release notes and readme.  enter to continue:" \
 && read x \
-&& git add project.clj ReleaseNotes.md README.md resources/pallet/riemann_crate/meta.edn \
+&& git add project.clj ReleaseNotes.md README.md \
 && git commit -m "Updated project.clj, release notes and readme for $version" \
 && echo -n "Peform release.  enter to continue:" && read x \
 && lein do clean, install, test, deploy clojars \
