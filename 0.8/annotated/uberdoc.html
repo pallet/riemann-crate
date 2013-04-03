@@ -3029,31 +3029,47 @@ net.brehaut.ClojureTools = (function (SH) {
   };
 })(SyntaxHighlighter);
 </script><title>com.palletops/riemann-crate -- Marginalia</title></head><body><table><tr><td class="docs"><div class="header"><h1 class="project-name">com.palletops/riemann-crate</h1><h2 class="project-version">0.8.0-SNAPSHOT</h2><br /><p>Crate for riemann installation</p>
-</div><div class="dependencies"><h3>dependencies</h3><table><tr><td class="dep-name">org.clojure/clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.4.0</td></tr><tr><td class="dep-name">com.palletops/pallet</td><td class="dotted"><hr /></td><td class="dep-version">0.8.0-SNAPSHOT</td></tr></table></div></td><td class="codes" style="text-align: center; vertical-align: middle;color: #666;padding-right:20px"><br /><br /><br />(this space intentionally left almost blank)</td></tr><tr><td class="docs"><div class="toc"><a name="toc"><h3>namespaces</h3></a><ul><li><a href="#pallet.crate.riemann">pallet.crate.riemann</a></li></ul></div></td><td class="codes">&nbsp;</td></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#pallet.crate.riemann" name="pallet.crate.riemann"><h1 class="project-name">pallet.crate.riemann</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>A pallet crate to install and configure riemann</p>
+</div><div class="dependencies"><h3>dependencies</h3><table><tr><td class="dep-name">org.clojure/clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.4.0</td></tr><tr><td class="dep-name">com.palletops/pallet</td><td class="dotted"><hr /></td><td class="dep-version">0.8.0-beta.6</td></tr></table></div></td><td class="codes" style="text-align: center; vertical-align: middle;color: #666;padding-right:20px"><br /><br /><br />(this space intentionally left almost blank)</td></tr><tr><td class="docs"><div class="toc"><a name="toc"><h3>namespaces</h3></a><ul><li><a href="#pallet.crate.riemann">pallet.crate.riemann</a></li></ul></div></td><td class="codes">&nbsp;</td></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#pallet.crate.riemann" name="pallet.crate.riemann"><h1 class="project-name">pallet.crate.riemann</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>A pallet crate to install and configure riemann</p>
 </td><td class="codes"><pre class="brush: clojure">(ns pallet.crate.riemann
   (:require
+   [clojure.tools.logging :refer [debugf]]
    [pallet.actions :as actions]
    [pallet.action :refer [with-action-options]]
    [pallet.actions :refer [directory exec-checked-script remote-directory
                            remote-file]]
-   [pallet.api :refer [plan-fn server-spec]]
+   [pallet.api :refer [plan-fn] :as api]
    [pallet.crate :refer [assoc-settings defmethod-plan defplan get-settings]]
-   [pallet.crate-install :refer [install]]
+   [pallet.crate-install :as crate-install]
+   [pallet.crate.nohup]
+   [pallet.crate.service
+    :refer [supervisor-config supervisor-config-map] :as service]
    [pallet.utils :refer [apply-map]]
+   [pallet.script.lib :refer [config-root file log-root]]
+   [pallet.stevedore :refer [fragment]]
    [pallet.version-dispatch :refer [defmethod-version-plan
                                     defmulti-version-plan]]))</pre></td></tr><tr><td class="docs"><p>Flag for recognising changes to configuration</p>
 </td><td class="codes"><pre class="brush: clojure">(def 
-  riemann-config-changed-flag &quot;riemann-config&quot;)</pre></td></tr><tr><td class="docs"><h1>Settings</h1>
-</td><td class="codes"><pre class="brush: clojure">(defn default-settings []
+  riemann-config-changed-flag &quot;riemann-config&quot;)</pre></td></tr><tr><td class="docs"><p>Return a service name for riemann.</p>
+
+<h1>Settings</h1>
+</td><td class="codes"><pre class="brush: clojure">(defn service-name
+  [{:keys [instance-id] :as options}]
+  (str &quot;riemann&quot; (when instance-id (str &quot;-&quot; instance-id))))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defn default-settings [options]
   {:version &quot;0.1.5&quot;
    :user &quot;riemann&quot;
    :owner &quot;riemann&quot;
    :group &quot;riemann&quot;
    :home &quot;/opt/riemann&quot;
-   :config-dir &quot;/etc/riemann/&quot;
+   :config-dir (fragment (file (config-root) &quot;riemann&quot;))
+   :log-dir (fragment (file (log-root) &quot;riemann&quot;))
+   :supervisor :nohup
+   :nohup {:process-name &quot;java&quot;}
+   :service-name (service-name options)
    :dist-url &quot;http://aphyr.com/riemann/riemann-%s.tar.bz2&quot;
+   :deb-url &quot;http://aphyr.com/riemann/riemann_%s_all.deb&quot;
    :config '(do
-              (logging/init :file &quot;riemann.log&quot;)
+              (logging/init :file &quot;/var/log/riemann/riemann.log&quot;)
               (tcp-server :host &quot;0.0.0.0&quot;)
               (udp-server :host &quot;0.0.0.0&quot;)
               (periodically-expire 10)
@@ -3073,7 +3089,10 @@ net.brehaut.ClojureTools = (function (SH) {
 </td><td class="codes"><pre class="brush: clojure">(defn url
   [{:keys [dist-url version] :as settings}]
   {:pre [dist-url version]}
-  (format dist-url version))</pre></td></tr><tr><td class="docs"><p>At the moment we just have a single implementation of settings,
+  (format dist-url version))</pre></td></tr><tr><td class="docs"><p>Return a script command to run riemann.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn run-command
+  [{:keys [home user config-dir] :as settings}]
+  (fragment ((file ~home &quot;bin&quot; &quot;riemann&quot;) (file ~config-dir &quot;riemann.conf&quot;))))</pre></td></tr><tr><td class="docs"><p>At the moment we just have a single implementation of settings,
 but this is open-coded.</p>
 </td><td class="codes"><pre class="brush: clojure">(defmulti-version-plan settings-map [version settings])</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defmethod-version-plan
@@ -3085,67 +3104,87 @@ but this is open-coded.</p>
             :install-strategy ::download
             :remote-file {:url (url settings)
                           :md5-url (str (url settings) &quot;.md5&quot;)
-                          :tar-options &quot;xj&quot;})))</pre></td></tr><tr><td class="docs"><p>Settings for riemann</p>
-</td><td class="codes"><pre class="brush: clojure">(defplan riemann-settings
+                          :tar-options &quot;xj&quot;})))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defmethod supervisor-config-map [:riemann :runit]
+  [_ {:keys [run-command service-name user] :as settings} options]
+  {:service-name service-name
+   :run-file {:content (str &quot;#!/bin/sh\nexec chpst -u &quot; user &quot; &quot; run-command)}})</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defmethod supervisor-config-map [:riemann :nohup]
+  [_ {:keys [run-command service-name user] :as settings} options]
+  {:service-name service-name
+   :run-file {:content run-command}
+   :user user})</pre></td></tr><tr><td class="docs"><p>Settings for riemann</p>
+</td><td class="codes"><pre class="brush: clojure">(defplan settings
   [{:keys [user owner group dist dist-urls version instance-id]
-    :as settings}]
-  (let [settings (merge (default-settings) settings)
-        settings (settings-map (:version settings) settings)]
-    (assoc-settings :riemann settings {:instance-id instance-id}))
-;;; # User
-  (defplan riemann-user
-    &quot;Create the riemann user&quot;
-    [{:keys [instance-id] :as options}]
-    (let [{:keys [user owner group home]} (get-settings :riemann options)]
-      (actions/group group :system true)
-      (when (not= owner user)
-        (actions/user owner :group group :system true))
-      (actions/user
-       user :group group :system true :create-home true :shell :bash))))</pre></td></tr><tr><td class="docs"><h1>Install</h1>
-</td><td class="codes"><pre class="brush: clojure">(defmethod-plan install ::download
+    :as settings}
+   &amp; {:keys [instance-id] :as options}]
+  (let [settings (merge (default-settings options) settings)
+        settings (settings-map (:version settings) settings)
+        settings (update-in settings [:run-command]
+                            #(or % (run-command settings)))]
+    (assoc-settings :riemann settings {:instance-id instance-id})
+    (supervisor-config :riemann settings (or options {}))))</pre></td></tr><tr><td class="docs"><p>Create the riemann user</p>
+
+<h1>User</h1>
+</td><td class="codes"><pre class="brush: clojure">(defplan user
+  [{:keys [instance-id] :as options}]
+  (let [{:keys [user owner group home]} (get-settings :riemann options)]
+    (actions/group group :system true)
+    (when (not= owner user)
+      (actions/user owner :group group :system true))
+    (actions/user
+     user :group group :system true :create-home true :shell :bash)))</pre></td></tr><tr><td class="docs"><h1>Install</h1>
+</td><td class="codes"><pre class="brush: clojure">(defmethod-plan crate-install/install ::download
   [facility instance-id]
   (let [{:keys [user owner group home remote-file] :as settings}
         (get-settings facility {:instance-id instance-id})]
     (directory home :owner owner :group group)
     (apply-map remote-directory home :owner owner :group group remote-file)))</pre></td></tr><tr><td class="docs"><p>Install riemann.</p>
-</td><td class="codes"><pre class="brush: clojure">(defplan install-riemann
-  [&amp; {:keys [instance-id]}]
-  (let [settings (get-settings :riemann {:instance-id instance-id})]
-    (install :riemann instance-id)))</pre></td></tr><tr><td class="docs"><p>Helper to write config files</p>
+</td><td class="codes"><pre class="brush: clojure">(defplan install
+  [{:keys [instance-id]}]
+  (let [{:keys [owner group log-dir] :as settings}
+        (get-settings :riemann {:instance-id instance-id})]
+    (crate-install/install :riemann instance-id)
+    (when log-dir
+      (directory log-dir :owner owner :group group :mode &quot;0755&quot;))))</pre></td></tr><tr><td class="docs"><p>Helper to write config files</p>
 
 <h1>Configuration</h1>
 </td><td class="codes"><pre class="brush: clojure">(defplan config-file
   [{:keys [owner group config-dir] :as settings} filename file-source]
   (directory config-dir :owner owner :group group)
-  (apply
-   remote-file (str config-dir &quot;/&quot; filename)
+  (apply-map
+   remote-file (fragment (file ~config-dir ~filename))
    :flag-on-changed riemann-config-changed-flag
    :owner owner :group group
-   (apply concat file-source)))</pre></td></tr><tr><td class="docs"><p>Write all config files</p>
-</td><td class="codes"><pre class="brush: clojure">(defplan riemann-conf
+   file-source))</pre></td></tr><tr><td class="docs"><p>Write all config files</p>
+</td><td class="codes"><pre class="brush: clojure">(defplan configure
   [{:keys [instance-id] :as options}]
-  (let [{:keys [config home user owner group] :as settings}
-        (get-settings :riemann options)]
-    (config-file settings &quot;riemann.conf&quot; {:content (str config)})))</pre></td></tr><tr><td class="docs"><p>Run riemann.</p>
-</td><td class="codes"><pre class="brush: clojure">(defplan riemann-run
-  [{:keys [instance-id] :as options}]
-  (let [{:keys [home user config-dir]}
+  (let [{:keys [config] :as settings} (get-settings :riemann options)]
+    (debugf &quot;configure %s %s&quot; settings options)
+    (config-file settings &quot;riemann.conf&quot; {:content (str config)})))</pre></td></tr><tr><td class="docs"><p>Run the riemann service.</p>
+
+<h1>Run</h1>
+</td><td class="codes"><pre class="brush: clojure">(defplan service
+  [&amp; {:keys [action if-flag if-stopped instance-id]
+      :or {action :manage}
+      :as options}]
+  (let [{:keys [supervision-options] :as settings}
         (get-settings :riemann {:instance-id instance-id})]
-    (with-action-options {:script-dir home :sudo-user user}
-      (exec-checked-script
-       (str &quot;Riemann run&quot;)
-       (&quot;(&quot;
-        (&quot;nohup&quot; (str ~home &quot;/bin/riemann&quot;) (str ~config-dir &quot;/riemann.conf&quot;))
-        &quot;&amp; )&quot;)
-       (&quot;sleep&quot; 5)))))</pre></td></tr><tr><td class="docs"><p>Returns a server-spec that installs and configures riemann</p>
-</td><td class="codes"><pre class="brush: clojure">(defn riemann
+    (service/service settings (merge supervision-options
+                                     (dissoc options :instance-id)))))</pre></td></tr><tr><td class="docs"><p>Returns a server-spec that installs and configures riemann.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn server-spec
   [settings &amp; {:keys [instance-id] :as options}]
-  (server-spec
+  (api/server-spec
    :phases
-   {:settings (plan-fn (riemann-settings (merge settings options)))
+   {:settings (plan-fn (pallet.crate.riemann/settings (merge settings options)))
     :install (plan-fn
-              (riemann-user options)
-              (install-riemann :instance-id instance-id))
-    :configure (plan-fn (riemann-conf options)
-                        (riemann-run options))}))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
+               (user options)
+               (install options))
+    :configure (plan-fn
+                 (configure options)
+                 (apply-map service :action :enable options))
+    :run (plan-fn
+           (apply-map service :action :start options))
+    :stop (plan-fn
+            (apply-map service :action :stop options))}))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr></table><div class="footer">Generated by <a href="https://github.com/fogus/marginalia">Marginalia</a>.&nbsp;&nbsp;Syntax highlighting provided by Alex Gorbatchev's <a href="http://alexgorbatchev.com/SyntaxHighlighter/">SyntaxHighlighter</a></div><script type="text/javascript">SyntaxHighlighter.defaults['gutter'] = false;
        SyntaxHighlighter.all()</script></body></html>
