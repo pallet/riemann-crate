@@ -2,6 +2,8 @@
   "A pallet crate to install and configure riemann"
   (:require
    [clojure.tools.logging :refer [debugf]]
+   [clojure.pprint :refer [pprint]]
+   [clojure.walk :refer [postwalk-replace]]
    [pallet.actions :as actions]
    [pallet.action :refer [with-action-options]]
    [pallet.actions :refer [directory exec-checked-script remote-directory
@@ -41,30 +43,38 @@
    :service-name (service-name options)
    :dist-url "http://aphyr.com/riemann/riemann-%s.tar.bz2"
    :deb-url "http://aphyr.com/riemann/riemann_%s_all.deb"
-   :config '(do
-              (logging/init :file "/var/log/riemann/riemann.log")
-              (tcp-server :host "0.0.0.0")
-              (udp-server :host "0.0.0.0")
-
-              (periodically-expire 10)
-
-              (let [client (tcp-client)
-                                        ; Keep events for 5 minutes by default
-                    index (default :ttl 300 (update-index (index)))]
-
-                (streams
-                 (with {:metric_f 1 :host nil :state "ok" :service "events/sec"}
-                       (rate 5 index))
-
-                 (where (service #"^per")
-                        (percentiles 5 [0 0.5 0.95 0.99 1]
-                                     index))
-
-                                        ; Log expired events.
-                 (expired
-                  (fn [event] (info "expired" event)))
-
-                 index)))})
+   :variables {:listen-host  "0.0.0.0"
+               :log-file     "/var/log/riemann.log"
+               :need-expire  true
+               :expire-every 10
+               :need-tcp     true
+               :tcp-port     5555
+               :need-udp     true
+               :udp-port     5555
+               :need-ws      true
+               :ws-port      5556
+               :need-repl    true
+               :repl-port    5557}
+   :config '(let [index (default {:state "ok"
+                                  :ttl   3600}
+                          (update-index (index)))]
+              (streams
+               (with :service "events per sec"
+                     (rate 30 index))
+               index))
+   :base-config '(do
+                   (logging/init :file :log-file)
+                   (when :need-tcp
+                     (tcp-server :host :listen-host :port :tcp-port))
+                   (when :need-udp
+                     (tcp-server :host :listen-host :port :udp-port))
+                   (when :need-ws
+                     (tcp-server :host :listen-host :port :ws-port))
+                   (when :need-repl
+                     (tcp-server :host :listen-host :port :repl-port))
+                   (when :need-expire
+                     (periodically-expire :expire-every))
+                   :config)})
 
 (defn url
   [{:keys [dist-url version] :as settings}]
@@ -157,9 +167,14 @@
 (defplan configure
   "Write all config files"
   [{:keys [instance-id] :as options}]
-  (let [{:keys [config] :as settings} (get-settings :riemann options)]
+  (let [settings (get-settings :riemann options)
+        {:keys [config variables base-config] :as settings} settings
+        config (postwalk-replace variables config)
+        variables (assoc variables :config config)
+        config (postwalk-replace variables base-config)]
     (debugf "configure %s %s" settings options)
-    (config-file settings "riemann.conf" {:content (str config)})))
+    (config-file settings "riemann.conf"
+                 {:content (with-out-str (pprint config))})))
 
 ;;; # Run
 (defplan service
