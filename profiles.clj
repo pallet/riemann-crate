@@ -6,7 +6,11 @@
                  [com.palletops/crates "0.1.1-SNAPSHOT"]
                  [riemann-clojure-client "0.0.3"]
                  [ch.qos.logback/logback-classic "1.0.9"]]
-  :plugins [[com.palletops/pallet-lein "0.6.0-beta.8"]]
+  :plugins [[com.palletops/pallet-lein "0.8.0-SNAPSHOT"]
+            [lein-set-version "0.3.0"]
+            [lein-resource "0.3.2"]
+            [codox/codox.leiningen "0.6.4"]
+            [lein-marginalia "0.7.1"]]
   :aliases {"live-test-up"
             ["pallet" "up"
              "--phases" "install,configure,test"
