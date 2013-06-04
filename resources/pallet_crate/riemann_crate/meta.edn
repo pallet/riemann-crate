@@ -1,4 +1,4 @@
-{:header "Riemann"
+{:header "riemann"
  :title
  "A [pallet](http://palletops.com/) crate to install and configure
  [riemann](http://riemann.io)."

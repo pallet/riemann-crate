@@ -55,6 +55,9 @@ The `settings` function provides a plan function that should be called in the
 session, where they can be found by the other crate functions, or by other
 crates wanting to interact with the riemann server.
 
+The `:supervision` key in the settings allows running riemann under `:runit`,
+`:upstart` or `:nohup`.
+
 The `install` function is responsible for actually installing riemann.  At
 present installation from tarball url is the only supported method.
 Installation from deb or rpm url would be nice to add, as these are now
