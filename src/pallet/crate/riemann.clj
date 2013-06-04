@@ -2,12 +2,13 @@
   "A pallet crate to install and configure riemann"
   (:require
    [clojure.tools.logging :refer [debugf]]
-   [pallet.actions :as actions]
    [pallet.action :refer [with-action-options]]
-   [pallet.actions :refer [directory exec-checked-script remote-directory
-                           remote-file]]
+   [pallet.actions :as actions
+    :refer [directory exec-checked-script packages remote-directory
+            remote-file]]
    [pallet.api :refer [plan-fn] :as api]
-   [pallet.crate :refer [assoc-settings defmethod-plan defplan get-settings]]
+   [pallet.crate :refer [assoc-settings defmethod-plan defplan get-settings
+                         service-phases]]
    [pallet.crate-install :as crate-install]
    [pallet.crate.nohup]
    [pallet.crate.service
@@ -97,6 +98,12 @@
   {:service-name service-name
    :run-file {:content (str "#!/bin/sh\nexec chpst -u " user " " run-command)}})
 
+(defmethod supervisor-config-map [:riemann :upstart]
+  [_ {:keys [run-command service-name user] :as settings} options]
+  {:service-name service-name
+   :exec run-command
+   :setuid user})
+
 (defmethod supervisor-config-map [:riemann :nohup]
   [_ {:keys [run-command service-name user] :as settings} options]
   {:service-name service-name
@@ -137,7 +144,7 @@
 (defplan install
   "Install riemann."
   [{:keys [instance-id]}]
-  (let [{:keys [owner group log-dir] :as settings}
+  (let [{:keys [install-strategy owner group log-dir] :as settings}
         (get-settings :riemann {:instance-id instance-id})]
     (crate-install/install :riemann instance-id)
     (when log-dir
@@ -177,14 +184,13 @@
   [settings & {:keys [instance-id] :as options}]
   (api/server-spec
    :phases
-   {:settings (plan-fn (pallet.crate.riemann/settings (merge settings options)))
-    :install (plan-fn
-               (user options)
-               (install options))
-    :configure (plan-fn
-                 (configure options)
-                 (apply-map service :action :enable options))
-    :run (plan-fn
-           (apply-map service :action :start options))
-    :stop (plan-fn
-            (apply-map service :action :stop options))}))
+   (merge {:settings (plan-fn (pallet.crate.riemann/settings (merge settings options)))
+           :install (plan-fn
+                      (user options)
+                      (install options))
+           :configure (plan-fn
+                        (configure options)
+                        (apply-map service :action :enable options))
+           :run (plan-fn
+                  (apply-map service :action :start options))}
+          (service-phases :riemann options service))))
