@@ -1,7 +1,9 @@
 {:dev
- {:dependencies [[com.palletops/pallet "0.8.0-beta.6" :classifier "tests"]
-                 [com.palletops/java-crate "0.8.0-beta.2"]
-                 [com.palletops/crates "0.1.0"]
+ {:dependencies [[com.palletops/pallet "0.8.0-beta.9" :classifier "tests"]
+                 [com.palletops/java-crate "0.8.0-beta.5"]
+                 [com.palletops/runit-crate "0.8.0-alpha.1"]
+                 [com.palletops/upstart-crate "0.8.0-alpha.1"]
+                 [com.palletops/crates "0.1.1-SNAPSHOT"]
                  [riemann-clojure-client "0.0.3"]
                  [ch.qos.logback/logback-classic "1.0.9"]]
   :plugins [[com.palletops/pallet-lein "0.6.0-beta.8"]]
