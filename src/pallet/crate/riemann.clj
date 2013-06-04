@@ -138,6 +138,7 @@
   [facility instance-id]
   (let [{:keys [user owner group home remote-file] :as settings}
         (get-settings facility {:instance-id instance-id})]
+    (packages :apt ["bzip2"] :aptitude ["bzip2"])
     (directory home :owner owner :group group)
     (apply-map remote-directory home :owner owner :group group remote-file)))
 
