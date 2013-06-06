@@ -7,6 +7,7 @@
                  [riemann-clojure-client "0.0.3"]
                  [ch.qos.logback/logback-classic "1.0.9"]]
   :plugins [[com.palletops/pallet-lein "0.8.0-SNAPSHOT"]
+            [com.palletops/lein-pallet-crate "0.1.0"]
             [lein-set-version "0.3.0"]
             [lein-resource "0.3.2"]
             [codox/codox.leiningen "0.6.4"]
