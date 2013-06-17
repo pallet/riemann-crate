@@ -26,3 +26,13 @@ The `configure` function writes the riemann configuration file, using the form
 passed to the :config key in the `settings` function.
 
 The `run` function starts the riemann server.
+
+
+## Live test on vmfest
+
+For example, to run the live test on VMFest, using Ubuntu 12.04:
+
+```sh
+lein with-profile +vmfest pallet up --selectors ubuntu-12-04 --phases install,configure,test
+lein with-profile +vmfest pallet down --selectors ubuntu-12-04
+```

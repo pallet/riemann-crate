@@ -68,6 +68,16 @@ passed to the :config key in the `settings` function.
 
 The `run` function starts the riemann server.
 
+
+## Live test on vmfest
+
+For example, to run the live test on VMFest, using Ubuntu 12.04:
+
+```sh
+lein with-profile +vmfest pallet up --selectors ubuntu-12-04 --phases install,configure,test
+lein with-profile +vmfest pallet down --selectors ubuntu-12-04
+```
+
 ## License
 
 Copyright (C) 2012, 2013 Hugo Duncan
