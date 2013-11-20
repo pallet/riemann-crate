@@ -29,7 +29,7 @@
       </div>
     </div>
       <div id="header">
-        <h1><a href="http://palletops.com"><span class="project-title">Riemann-crate 0.8.0-SNAPSHOT API documentation</span></a></h1>
+        <h1><a href="http://palletops.com"><span class="project-title">Riemann-crate 0.8.0-alpha.3 API documentation</span></a></h1>
       </div>
     </header>
     <navigation>
@@ -42,7 +42,7 @@
       <div id="vars" class="sidebar">
         <h3>Public Vars</h3>
         <ul class="ns-var-links">
-          <li class="ns-var-list"><a class="ns-var-link ns-var-name" href="pallet.crate.riemann.html#var-config-file">config-file</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="pallet.crate.riemann.html#var-configure">configure</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="pallet.crate.riemann.html#var-install">install</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="pallet.crate.riemann.html#var-riemann-config-changed-flag">riemann-config-changed-flag</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="pallet.crate.riemann.html#var-run-command">run-command</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="pallet.crate.riemann.html#var-server-spec">server-spec</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="pallet.crate.riemann.html#var-service">service</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="pallet.crate.riemann.html#var-service-name">service-name</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="pallet.crate.riemann.html#var-settings">settings</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="pallet.crate.riemann.html#var-user">user</a></li>
+          <li class="ns-var-list"><a class="ns-var-link ns-var-name" href="pallet.crate.riemann.html#var-config-changed-flag">config-changed-flag</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="pallet.crate.riemann.html#var-config-file">config-file</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="pallet.crate.riemann.html#var-configure">configure</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="pallet.crate.riemann.html#var-ensure-service">ensure-service</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="pallet.crate.riemann.html#var-install">install</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="pallet.crate.riemann.html#var-run-command">run-command</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="pallet.crate.riemann.html#var-server-spec">server-spec</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="pallet.crate.riemann.html#var-service">service</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="pallet.crate.riemann.html#var-service-name">service-name</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="pallet.crate.riemann.html#var-settings">settings</a></li><li class="ns-var-list"><a class="ns-var-link ns-var-name" href="pallet.crate.riemann.html#var-user">user</a></li>
         </ul>
       </div>
     </navigation>
@@ -53,31 +53,7 @@
 </div>
         <div class="ns-vars">
           <div class="public">
-            <h3><a id="var-config-file" class="source var-name" href="https://github.com/pallet/riemann-crate/blob/develop/src/pallet/crate/riemann.clj#L147">config-file</a></h3>
-            <h4 class="var-type fn" id="var-type">fn</h4>
-            <div class="usage">[{:keys [owner group config-dir], :as settings} filename file-source]</div>
-            
-            
-            <div class="doc"><p>Helper to write config files</p>
-</div>
-          </div><div class="public">
-            <h3><a id="var-configure" class="source var-name" href="https://github.com/pallet/riemann-crate/blob/develop/src/pallet/crate/riemann.clj#L157">configure</a></h3>
-            <h4 class="var-type fn" id="var-type">fn</h4>
-            <div class="usage">[{:keys [instance-id], :as options}]</div>
-            
-            
-            <div class="doc"><p>Write all config files</p>
-</div>
-          </div><div class="public">
-            <h3><a id="var-install" class="source var-name" href="https://github.com/pallet/riemann-crate/blob/develop/src/pallet/crate/riemann.clj#L137">install</a></h3>
-            <h4 class="var-type fn" id="var-type">fn</h4>
-            <div class="usage">[{:keys [instance-id]}]</div>
-            
-            
-            <div class="doc"><p>Install riemann.</p>
-</div>
-          </div><div class="public">
-            <h3><a id="var-riemann-config-changed-flag" class="source var-name" href="https://github.com/pallet/riemann-crate/blob/develop/src/pallet/crate/riemann.clj#L22">riemann-config-changed-flag</a></h3>
+            <h3><a id="var-config-changed-flag" class="source var-name" href="https://github.com/pallet/riemann-crate/blob/develop/src/pallet/crate/riemann.clj#L25">config-changed-flag</a></h3>
             <h4 class="var-type var" id="var-type">var</h4>
             
             
@@ -85,7 +61,39 @@
             <div class="doc"><p>Flag for recognising changes to configuration</p>
 </div>
           </div><div class="public">
-            <h3><a id="var-run-command" class="source var-name" href="https://github.com/pallet/riemann-crate/blob/develop/src/pallet/crate/riemann.clj#L74">run-command</a></h3>
+            <h3><a id="var-config-file" class="source var-name" href="https://github.com/pallet/riemann-crate/blob/develop/src/pallet/crate/riemann.clj#L170">config-file</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[{:keys [owner group config-dir], :as settings} filename file-source]</div>
+            
+            
+            <div class="doc"><p>Helper to write config files</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-configure" class="source var-name" href="https://github.com/pallet/riemann-crate/blob/develop/src/pallet/crate/riemann.clj#L180">configure</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[{:keys [instance-id], :as options}]</div>
+            
+            
+            <div class="doc"><p>Write all config files</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-ensure-service" class="source var-name" href="https://github.com/pallet/riemann-crate/blob/develop/src/pallet/crate/riemann.clj#L203">ensure-service</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[&amp; {:keys [instance-id], :as options}]</div>
+            
+            
+            <div class="doc"><p>Ensure the service is running and has read the latest configuration.</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-install" class="source var-name" href="https://github.com/pallet/riemann-crate/blob/develop/src/pallet/crate/riemann.clj#L160">install</a></h3>
+            <h4 class="var-type fn" id="var-type">fn</h4>
+            <div class="usage">[{:keys [instance-id]}]</div>
+            
+            
+            <div class="doc"><p>Install riemann.</p>
+</div>
+          </div><div class="public">
+            <h3><a id="var-run-command" class="source var-name" href="https://github.com/pallet/riemann-crate/blob/develop/src/pallet/crate/riemann.clj#L85">run-command</a></h3>
             <h4 class="var-type fn" id="var-type">fn</h4>
             <div class="usage">[{:keys [home user config-dir], :as settings}]</div>
             
@@ -93,7 +101,7 @@
             <div class="doc"><p>Return a script command to run riemann.</p>
 </div>
           </div><div class="public">
-            <h3><a id="var-server-spec" class="source var-name" href="https://github.com/pallet/riemann-crate/blob/develop/src/pallet/crate/riemann.clj#L175">server-spec</a></h3>
+            <h3><a id="var-server-spec" class="source var-name" href="https://github.com/pallet/riemann-crate/blob/develop/src/pallet/crate/riemann.clj#L213">server-spec</a></h3>
             <h4 class="var-type fn" id="var-type">fn</h4>
             <div class="usage">[settings &amp; {:keys [instance-id], :as options}]</div>
             
@@ -101,7 +109,7 @@
             <div class="doc"><p>Returns a server-spec that installs and configures riemann.</p>
 </div>
           </div><div class="public">
-            <h3><a id="var-service" class="source var-name" href="https://github.com/pallet/riemann-crate/blob/develop/src/pallet/crate/riemann.clj#L165">service</a></h3>
+            <h3><a id="var-service" class="source var-name" href="https://github.com/pallet/riemann-crate/blob/develop/src/pallet/crate/riemann.clj#L193">service</a></h3>
             <h4 class="var-type fn" id="var-type">fn</h4>
             <div class="usage">[&amp; {:keys [action if-flag if-stopped instance-id], :or {action :manage}, :as options}]</div>
             
@@ -109,7 +117,7 @@
             <div class="doc"><p>Run the riemann service.</p>
 </div>
           </div><div class="public">
-            <h3><a id="var-service-name" class="source var-name" href="https://github.com/pallet/riemann-crate/blob/develop/src/pallet/crate/riemann.clj#L26">service-name</a></h3>
+            <h3><a id="var-service-name" class="source var-name" href="https://github.com/pallet/riemann-crate/blob/develop/src/pallet/crate/riemann.clj#L29">service-name</a></h3>
             <h4 class="var-type fn" id="var-type">fn</h4>
             <div class="usage">[{:keys [instance-id], :as options}]</div>
             
@@ -117,7 +125,7 @@
             <div class="doc"><p>Return a service name for riemann.</p>
 </div>
           </div><div class="public">
-            <h3><a id="var-settings" class="source var-name" href="https://github.com/pallet/riemann-crate/blob/develop/src/pallet/crate/riemann.clj#L106">settings</a></h3>
+            <h3><a id="var-settings" class="source var-name" href="https://github.com/pallet/riemann-crate/blob/develop/src/pallet/crate/riemann.clj#L123">settings</a></h3>
             <h4 class="var-type fn" id="var-type">fn</h4>
             <div class="usage">[{:keys [user owner group dist dist-urls version instance-id], :as settings} &amp; {:keys [instance-id], :as options}]</div>
             
@@ -125,7 +133,7 @@
             <div class="doc"><p>Settings for riemann</p>
 </div>
           </div><div class="public">
-            <h3><a id="var-user" class="source var-name" href="https://github.com/pallet/riemann-crate/blob/develop/src/pallet/crate/riemann.clj#L119">user</a></h3>
+            <h3><a id="var-user" class="source var-name" href="https://github.com/pallet/riemann-crate/blob/develop/src/pallet/crate/riemann.clj#L137">user</a></h3>
             <h4 class="var-type fn" id="var-type">fn</h4>
             <div class="usage">[{:keys [instance-id], :as options}]</div>
             
