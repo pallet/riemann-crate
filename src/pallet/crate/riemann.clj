@@ -23,7 +23,7 @@
 
 
 (def ^{:doc "Flag for recognising changes to configuration"}
-  riemann-config-changed-flag "riemann-config")
+  config-changed-flag "riemann-config")
 
 ;;; # Settings
 (defn service-name
@@ -169,7 +169,7 @@
   (directory config-dir :owner owner :group group)
   (apply-map
    remote-file (fragment (file ~config-dir ~filename))
-   :flag-on-changed riemann-config-changed-flag
+   :flag-on-changed config-changed-flag
    :owner owner :group group
    file-source))
 
