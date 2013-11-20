@@ -15,7 +15,7 @@
    [pallet.crate.nohup]
    [pallet.crate.service
     :refer [supervisor-config supervisor-config-map] :as service]
-   [pallet.utils :refer [apply-map]]
+   [pallet.utils :refer [apply-map deep-merge]]
    [pallet.script.lib :refer [config-root file log-root]]
    [pallet.stevedore :refer [fragment]]
    [pallet.version-dispatch :refer [defmethod-version-plan
@@ -125,10 +125,11 @@
   [{:keys [user owner group dist dist-urls version instance-id]
     :as settings}
    & {:keys [instance-id] :as options}]
-  (let [settings (merge (default-settings options) settings)
+  (let [settings (deep-merge (default-settings options) settings)
         settings (settings-map (:version settings) settings)
         settings (update-in settings [:run-command]
                             #(or % (run-command settings)))]
+    (debugf "riemann settings %s" settings)
     (assoc-settings :riemann settings {:instance-id instance-id})
     (supervisor-config :riemann settings (or options {}))))
 
