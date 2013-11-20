@@ -138,9 +138,13 @@
   "Create the riemann user"
   [{:keys [instance-id] :as options}]
   (let [{:keys [user owner group home]} (get-settings :riemann options)]
+    (assert (string? user) "user must be a username string")
+    (assert (string? owner) "owner must be a username string")
     (actions/group group :system true)
+    (debugf "riemann create owner %s" owner)
     (when (not= owner user)
       (actions/user owner :group group :system true))
+    (debugf "riemann create user %s" user)
     (actions/user
      user :group group :system true :create-home true :shell :bash)))
 
