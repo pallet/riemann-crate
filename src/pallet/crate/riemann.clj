@@ -85,7 +85,7 @@
 (defn run-command
   "Return a script command to run riemann."
   [{:keys [home user config-dir] :as settings}]
-  (fragment ((file ~home "bin" "riemann") (file ~config-dir "riemann.conf"))))
+  (fragment ((file ~home "bin" "riemann") (file ~config-dir "riemann.config"))))
 
 ;;; At the moment we just have a single implementation of settings,
 ;;; but this is open-coded.
@@ -182,7 +182,7 @@
         variables (assoc variables :config config)
         config (postwalk-replace variables base-config)]
     (debugf "configure %s %s" settings options)
-    (config-file settings "riemann.conf"
+    (config-file settings "riemann.config"
                  {:content (with-out-str (pprint config))})))
 
 ;;; # Run
