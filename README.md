@@ -10,7 +10,7 @@ A [pallet](http://palletops.com/) crate to install and configure
 ### Dependency Information
 
 ```clj
-:dependencies [[com.palletops/riemann-crate "0.8.0-alpha.2"]]
+:dependencies [[com.palletops/riemann-crate "0.8.0-alpha.3"]]
 ```
 
 ### Releases
@@ -20,6 +20,14 @@ A [pallet](http://palletops.com/) crate to install and configure
   <tr><th>Pallet</th><th>Crate Version</th><th>Repo</th><th>GroupId</th></tr>
 </thead>
 <tbody>
+  <tr>
+    <th>0.8.0-RC.4</th>
+    <td>0.8.0-alpha.3</td>
+    <td>clojars</td>
+    <td>com.palletops</td>
+    <td><a href='https://github.com/pallet/riemann-crate/blob/0.8.0-alpha.3/ReleaseNotes.md'>Release Notes</a></td>
+    <td><a href='https://github.com/pallet/riemann-crate/blob/0.8.0-alpha.3/'>Source</a></td>
+  </tr>
   <tr>
     <th>0.8.0-beta.6</th>
     <td>0.8.0-alpha.2</td>
