@@ -10,7 +10,7 @@ A [pallet](http://palletops.com/) crate to install and configure
 ### Dependency Information
 
 ```clj
-:dependencies [[com.palletops/riemann-crate "0.8.0-alpha.2"]]
+:dependencies [[com.palletops/riemann-crate "0.8.0-alpha.3"]]
 ```
 
 ### Releases
@@ -20,6 +20,14 @@ A [pallet](http://palletops.com/) crate to install and configure
   <tr><th>Pallet</th><th>Crate Version</th><th>Repo</th><th>GroupId</th></tr>
 </thead>
 <tbody>
+  <tr>
+    <th>0.8.0-RC.4</th>
+    <td>0.8.0-alpha.3</td>
+    <td>clojars</td>
+    <td>com.palletops</td>
+    <td><a href='https://github.com/pallet/riemann-crate/blob/0.8.0-alpha.3/ReleaseNotes.md'>Release Notes</a></td>
+    <td><a href='https://github.com/pallet/riemann-crate/blob/0.8.0-alpha.3/'>Source</a></td>
+  </tr>
   <tr>
     <th>0.8.0-beta.6</th>
     <td>0.8.0-alpha.2</td>
@@ -55,6 +63,9 @@ The `settings` function provides a plan function that should be called in the
 session, where they can be found by the other crate functions, or by other
 crates wanting to interact with the riemann server.
 
+The `:supervision` key in the settings allows running riemann under `:runit`,
+`:upstart` or `:nohup`.
+
 The `install` function is responsible for actually installing riemann.  At
 present installation from tarball url is the only supported method.
 Installation from deb or rpm url would be nice to add, as these are now
@@ -64,6 +75,16 @@ The `configure` function writes the riemann configuration file, using the form
 passed to the :config key in the `settings` function.
 
 The `run` function starts the riemann server.
+
+
+## Live test on vmfest
+
+For example, to run the live test on VMFest, using Ubuntu 12.04:
+
+```sh
+lein with-profile +vmfest pallet up --selectors ubuntu-12-04 --phases install,configure,test
+lein with-profile +vmfest pallet down --selectors ubuntu-12-04
+```
 
 ## License
 

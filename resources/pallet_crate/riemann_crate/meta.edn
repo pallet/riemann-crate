@@ -1,4 +1,4 @@
-{:header "Riemann"
+{:header "riemann"
  :title
  "A [pallet](http://palletops.com/) crate to install and configure
  [riemann](http://riemann.io)."
@@ -8,5 +8,6 @@
  :tag-prefix ""
  :artifact-id "riemann-crate"
  :source-path "src/pallet/crate/riemann.clj"
- :versions [{:pallet "0.8.0-beta.6" :version "0.8.0-alpha.2"}
+ :versions [{:pallet "0.8.0-RC.4" :version "0.8.0-alpha.3"}
+            {:pallet "0.8.0-beta.6" :version "0.8.0-alpha.2"}
             {:pallet "0.8.0-beta.1" :version "0.8.0-alpha.1"}]}

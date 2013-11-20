@@ -9,7 +9,8 @@
    [pallet.crate.java :as java]
    [pallet.crate.network-service :refer [wait-for-port-listen]]
    [pallet.crate.nohup :as nohup]
-   [pallet.crate.runit :as runit]))
+   [pallet.crate.runit :as runit]
+   [pallet.crate.upstart :as upstart]))
 
 (deftest invoke-test
   (is (build-actions/build-actions {}
@@ -36,4 +37,16 @@
              (runit/server-spec {})
              (riemann/server-spec {:supervisor :runit})]
    :phases {:install (plan-fn (package-manager :update))
-            :test (plan-fn (wait-for-port-listen 5555))}))
+            :test (plan-fn
+                    (riemann/service :action :start)
+                    (wait-for-port-listen 5555))}))
+
+(def live-upstart-test-spec
+  (server-spec
+   :extends [(java/server-spec {})
+             (upstart/server-spec {})
+             (riemann/server-spec {:supervisor :upstart})]
+   :phases {:install (plan-fn (package-manager :update))
+            :test (plan-fn
+                    (riemann/service :action :start)
+                    (wait-for-port-listen 5555))}))
