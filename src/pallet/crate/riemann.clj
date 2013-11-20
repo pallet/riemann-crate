@@ -68,11 +68,11 @@
                    (when :need-tcp
                      (tcp-server :host :listen-host :port :tcp-port))
                    (when :need-udp
-                     (tcp-server :host :listen-host :port :udp-port))
+                     (udp-server :host :listen-host :port :udp-port))
                    (when :need-ws
-                     (tcp-server :host :listen-host :port :ws-port))
+                     (ws-server :host :listen-host :port :ws-port))
                    (when :need-repl
-                     (tcp-server :host :listen-host :port :repl-port))
+                     (repl-server :host :listen-host :port :repl-port))
                    (when :need-expire
                      (periodically-expire :expire-every))
                    :config)})
