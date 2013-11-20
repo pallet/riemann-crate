@@ -200,6 +200,16 @@
     (service/service settings (merge supervision-options
                                      (dissoc options :instance-id)))))
 
+(defplan ensure-service
+  "Ensure the service is running and has read the latest configuration."
+  [& {:keys [instance-id] :as options}]
+  (service :instance-id instance-id
+           :if-stopped true
+           :action :start)
+  (service :instance-id instance-id
+           :if-flag config-changed-flag
+           :action :reload))
+
 (defn server-spec
   "Returns a server-spec that installs and configures riemann."
   [settings & {:keys [instance-id] :as options}]
@@ -213,5 +223,6 @@
                         (configure options)
                         (apply-map service :action :enable options))
            :run (plan-fn
-                  (apply-map service :action :start options))}
+                 (apply-map service :action :start options))
+           :ensure-service (plan-fn (apply-map ensure-service options))}
           (service-phases :riemann options service))))
