@@ -1,3 +1,11 @@
+## 0.8.0-alpha.4
+
+- Make clojure and pallet :provided scoped
+
+- Add configuration for instrumentation
+
+- Update default Riemann version
+
 # Riemann Crate
 
 ## 0.8.0-alpha.3
