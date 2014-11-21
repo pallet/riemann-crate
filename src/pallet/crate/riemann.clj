@@ -32,7 +32,7 @@
   (str "riemann" (when instance-id (str "-" instance-id))))
 
 (defn default-settings [options]
-  {:version "0.2.3"
+  {:version "0.2.6"
    :user "riemann"
    :owner "riemann"
    :group "riemann"
@@ -55,14 +55,15 @@
                :need-ws      true
                :ws-port      5556
                :need-repl    true
-               :repl-port    5557}
-   :config '(let [index (default {:state "ok"
-                                  :ttl   3600}
-                          (update-index (index)))]
+               :repl-port    5557
+               :need-instrumentation true
+               :instrumentation-every 10}
+   :config '(let [index (tap :index (index))]
               (streams
-               (with :service "events per sec"
-                     (rate 30 index))
-               index))
+               (default :ttl 3600
+                 (with :service "events per sec"
+                       (rate 30 index))
+                 index)))
    :base-config '(do
                    (logging/init :file :log-file)
                    (when :need-tcp
@@ -75,6 +76,9 @@
                      (repl-server :host :listen-host :port :repl-port))
                    (when :need-expire
                      (periodically-expire :expire-every))
+                   (instrumentation
+                    {:interval :instrumentation-every
+                     :enabled? :need-instrumentation})
                    :config)})
 
 (defn url
