@@ -32,7 +32,7 @@
   (str "riemann" (when instance-id (str "-" instance-id))))
 
 (defn default-settings [options]
-  {:version "0.2.3"
+  {:version "0.2.6"
    :user "riemann"
    :owner "riemann"
    :group "riemann"
